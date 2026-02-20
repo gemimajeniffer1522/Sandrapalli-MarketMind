@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sandrapalli's MarketMind</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <!-- SCAN LINE OVERLAY -->
+  <div class="scanlines"></div>
+  <div class="noise"></div>
+
+  <!-- TICKER BAR -->
+  <div class="ticker-bar">
+    <div class="ticker-label">◈ LIVE MARKET</div>
+    <div class="ticker-track">
+      <div class="ticker-inner" id="tickerInner">
+        <!-- populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <div class="app-shell">
+
+    <!-- HEADER -->
+    <header class="site-header">
+      <div class="header-left">
+        <div class="brand-eyebrow">AI-POWERED STOCK INTELLIGENCE PLATFORM</div>
+        <h1 class="brand-name">
+          <span class="brand-s">SANDRAPALLI'S</span>
+          <span class="brand-m">MARKETMIND</span>
+        </h1>
+        <div class="brand-sub">LSTM Neural Network · NLP Sentiment · Real-Time Decisions</div>
+      </div>
+      <div class="header-right">
+        <div class="system-badge">
+          <span class="pulse-dot"></span>
+          <span>SYSTEM LIVE</span>
+        </div>
+        <div class="clock-block">
+          <div class="clock" id="clock">--:--:-- UTC</div>
+          <div class="clock-date" id="clockDate">Loading…</div>
+        </div>
+        <div class="market-tags">
+          <span>GLOBAL MARKETS</span>
+          <span class="sep">·</span>
+          <span>NSE</span>
+          <span class="sep">·</span>
+          <span>NYSE</span>
+          <span class="sep">·</span>
+          <span>NASDAQ</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- DIVIDER -->
+    <div class="h-rule"></div>
+
+    <!-- TABS -->
+    <nav class="tabs">
+      <button class="tab active" data-tab="single">◈ SINGLE STOCK ANALYSIS</button>
+      <button class="tab" data-tab="portfolio">◈ PORTFOLIO OVERVIEW</button>
+    </nav>
+
+    <!-- ═══════════════════════════════════════ SINGLE STOCK ══════════════════ -->
+    <section class="panel active" id="panelSingle">
+      <!-- SEARCH ROW -->
+      <div class="search-row">
+        <div class="search-wrap">
+          <input class="search-input" id="searchInput" type="text"
+            placeholder="e.g. AAPL · TSLA · RELIANCE.NS" autocomplete="off" />
+          <button class="analyze-btn" id="analyzeBtn">ANALYZE →</button>
+        </div>
+        <div class="quick-chips">
+          <span class="chips-label">QUICK SELECT —</span>
+          <div class="chips" id="quickChips">
+            <button class="chip">AAPL</button><button class="chip">MSFT</button>
+            <button class="chip">GOOGL</button><button class="chip">TSLA</button>
+            <button class="chip">NVDA</button><button class="chip">AMZN</button>
+            <button class="chip">RELIANCE.NS</button><button class="chip">TCS.NS</button>
+            <button class="chip">INFY.NS</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOADING STATE -->
+      <div class="loading-panel" id="loadingPanel" style="display:none">
+        <div class="loading-ring"></div>
+        <div class="loading-text">RUNNING LSTM ENGINE<span class="blink">_</span></div>
+      </div>
+
+      <!-- RESULTS -->
+      <div class="results-grid" id="resultsGrid" style="display:none">
+
+        <!-- Quote Card -->
+        <div class="card card-quote" id="cardQuote">
+          <div class="card-label">QUOTE</div>
+          <div class="quote-symbol" id="qSymbol">—</div>
+          <div class="quote-price" id="qPrice">—</div>
+          <div class="quote-change" id="qChange">—</div>
+          <div class="quote-meta">
+            <div class="qm-row"><span>VOLUME</span><span id="qVolume">—</span></div>
+            <div class="qm-row"><span>MKT CAP</span><span id="qMktCap">—</span></div>
+            <div class="qm-row"><span>P/E</span><span id="qPE">—</span></div>
+            <div class="qm-row"><span>52W LOW</span><span id="q52L">—</span></div>
+            <div class="qm-row"><span>52W HIGH</span><span id="q52H">—</span></div>
+            <div class="qm-row"><span>EXCHANGE</span><span id="qExchange">—</span></div>
+          </div>
+        </div>
+
+        <!-- LSTM Signal Card -->
+        <div class="card card-signal" id="cardSignal">
+          <div class="card-label">LSTM SIGNAL</div>
+          <div class="signal-badge" id="signalBadge">—</div>
+          <div class="signal-confidence">
+            <span>CONFIDENCE</span>
+            <div class="conf-bar-wrap">
+              <div class="conf-bar" id="confBar"></div>
+            </div>
+            <span id="confValue">—%</span>
+          </div>
+          <div class="signal-metrics">
+            <div class="sm-row"><span>RSI</span><span id="sRSI">—</span></div>
+            <div class="sm-row"><span>MACD</span><span id="sMACD">—</span></div>
+            <div class="sm-row"><span>VOLATILITY</span><span id="sVol">—</span></div>
+            <div class="sm-row"><span>SMA 20</span><span id="sSMA20">—</span></div>
+            <div class="sm-row"><span>SMA 50</span><span id="sSMA50">—</span></div>
+            <div class="sm-row"><span>PREDICTED</span><span id="sPred">—</span></div>
+          </div>
+        </div>
+
+        <!-- Sentiment Card -->
+        <div class="card card-sentiment" id="cardSentiment">
+          <div class="card-label">NLP SENTIMENT</div>
+          <div class="sentiment-label" id="sentLabel">—</div>
+          <div class="sentiment-bars">
+            <div class="sb-row">
+              <span>OVERALL</span>
+              <div class="sbar-wrap"><div class="sbar" id="sbOverall"></div></div>
+              <span id="sbOverallV">—</span>
+            </div>
+            <div class="sb-row">
+              <span>NEWS</span>
+              <div class="sbar-wrap"><div class="sbar" id="sbNews"></div></div>
+              <span id="sbNewsV">—</span>
+            </div>
+            <div class="sb-row">
+              <span>SOCIAL</span>
+              <div class="sbar-wrap"><div class="sbar" id="sbSocial"></div></div>
+              <span id="sbSocialV">—</span>
+            </div>
+            <div class="sb-row">
+              <span>ANALYST</span>
+              <div class="sbar-wrap"><div class="sbar" id="sbAnalyst"></div></div>
+              <span id="sbAnalystV">—</span>
+            </div>
+          </div>
+          <div class="support-resistance">
+            <div class="sr-row"><span>SUPPORT</span><span id="srSupport">—</span></div>
+            <div class="sr-row"><span>RESISTANCE</span><span id="srResist">—</span></div>
+          </div>
+        </div>
+
+        <!-- Chart Card -->
+        <div class="card card-chart">
+          <div class="card-label">PRICE HISTORY
+            <div class="period-btns" id="periodBtns">
+              <button class="pbtn active" data-period="1mo">1M</button>
+              <button class="pbtn" data-period="3mo">3M</button>
+              <button class="pbtn" data-period="6mo">6M</button>
+              <button class="pbtn" data-period="1y">1Y</button>
+            </div>
+          </div>
+          <canvas id="priceChart"></canvas>
+        </div>
+
+      </div><!-- /results-grid -->
+
+      <!-- DISCLAIMER -->
+      <div class="disclaimer">
+        ⚠ FOR EDUCATIONAL USE ONLY. NOT FINANCIAL ADVICE.
+        PAST PERFORMANCE DOES NOT GUARANTEE FUTURE RESULTS.
+        CONSULT A LICENSED FINANCIAL ADVISOR BEFORE INVESTING.
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════ PORTFOLIO ═════════════════════ -->
+    <section class="panel" id="panelPortfolio">
+      <div class="port-builder">
+        <div class="port-header">
+          <span class="card-label">BUILD PORTFOLIO</span>
+          <button class="add-holding-btn" id="addHoldingBtn">+ ADD HOLDING</button>
+        </div>
+        <div class="holdings-list" id="holdingsList">
+          <!-- holdings rows injected here -->
+        </div>
+        <button class="analyze-portfolio-btn" id="analyzePortfolioBtn">ANALYZE PORTFOLIO →</button>
+      </div>
+
+      <div class="port-results" id="portResults" style="display:none">
+        <div class="port-summary" id="portSummary"></div>
+        <div class="port-table-wrap">
+          <table class="port-table" id="portTable">
+            <thead>
+              <tr>
+                <th>SYMBOL</th><th>QTY</th><th>AVG COST</th>
+                <th>CURRENT</th><th>VALUE</th><th>P&amp;L</th><th>SIGNAL</th>
+              </tr>
+            </thead>
+            <tbody id="portTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="disclaimer">
+        ⚠ FOR EDUCATIONAL USE ONLY. NOT FINANCIAL ADVICE.
+        PAST PERFORMANCE DOES NOT GUARANTEE FUTURE RESULTS.
+        CONSULT A LICENSED FINANCIAL ADVISOR BEFORE INVESTING.
+      </div>
+    </section>
+
+  </div><!-- /app-shell -->
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <span class="brand-s">SANDRAPALLI'S</span>
+    <span class="brand-m foot-m">MARKETMIND</span>
+    <span class="foot-meta">© 2026 SANDRAPALLI'S MARKETMIND · LSTM INTELLIGENCE ENGINE v2.0 · ALL MARKETS</span>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
